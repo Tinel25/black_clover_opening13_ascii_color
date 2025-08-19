@@ -1,0 +1,1 @@
+# black_clover_opening13_ascii_color
