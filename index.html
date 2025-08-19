@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tinel25</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #ascii-container {
+      white-space: pre;
+      font-size: 10px;
+      line-height: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    #start-btn {
+      padding: 20px 40px;
+      font-size: 24px;
+      cursor: pointer;
+      background-color: #222;
+      color: white;
+      border: 2px solid white;
+      border-radius: 8px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="ascii-container"></div>
+  <button id="start-btn">▶️ Lancer l'animation</button>
+  <audio id="bg-music" src="clover_opening13.mp3" loop></audio>
+
+  <script>
+    const container = document.getElementById("ascii-container");
+    const music = document.getElementById("bg-music");
+    const startBtn = document.getElementById("start-btn");
+
+    let currentBatch = 0;
+    let currentFrame = 0;
+    let frames = [];
+
+    function showFrame() {
+      if (frames.length === 0) return;
+
+      container.innerHTML = frames[currentFrame];
+      currentFrame++;
+
+      if (currentFrame >= frames.length) {
+        currentBatch++;
+        currentFrame = 0;
+        loadBatch(currentBatch);
+      } else {
+        requestAnimationFrame(() => setTimeout(showFrame, 40));
+      }
+    }
+
+    function loadBatch(index) {
+      const script = document.createElement("script");
+      script.src = `ascii_output/ascii_frames_${index}.js`;
+      script.setAttribute("data-batch", "true");
+
+      script.onload = () => {
+        if (window.frames && window.frames.length > 0) {
+          frames = window.frames;
+          showFrame();
+        } else {
+          alert("🎬 Fin de l’animation !");
+        }
+      };
+
+      script.onerror = () => {
+        alert("🎬 Animation terminée !");
+      };
+
+      const oldScript = document.querySelector("script[data-batch]");
+      if (oldScript) oldScript.remove();
+      window.frames = [];
+      document.body.appendChild(script);
+    }
+
+    startBtn.addEventListener("click", () => {
+      startBtn.style.display = "none";
+      container.style.display = "block";
+
+      music.play().catch(err => {
+        console.warn("Audio bloqué :", err);
+        alert("Active le son pour profiter de l’ambiance !");
+      });
+
+      loadBatch(currentBatch);
+    });
+  </script>
+</body>
+</html>
