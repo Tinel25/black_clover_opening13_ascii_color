@@ -62,7 +62,7 @@
         currentFrame = 0;
         loadBatch(currentBatch);
       } else {
-        requestAnimationFrame(() => setTimeout(showFrame, 40));
+        setTimeout(showFrame, 40); // ✅ plus fluide sans requestAnimationFrame
       }
     }
 
